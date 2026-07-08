@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Movie {
+  movieId     Int       @id @default(autoincrement())
+  movieName   String
+  watched     Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  watchListId Int
+  WatchList   WatchList @relation(fields: [watchListId], references: [listId])
+}
+
+model User {
+  userId       Int         @id @default(autoincrement())
+  email        String      @unique
+  username     String      @unique
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  WatchList    WatchList[]
+}
+
+model WatchList {
+  listId    Int      @id @default(autoincrement())
+  listName  String
+  createdAt DateTime @default(now())
+  creatorId Int
+  Movie     Movie[]
+  User      User     @relation(fields: [creatorId], references: [userId])
+
+  @@unique([creatorId, listName])
+}
